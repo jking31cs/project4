@@ -1,0 +1,58 @@
+# -- library makefile rules
+
+
+all:	$(NAME)
+debug:	$(NAME).dbg
+master: clean depend install
+
+include $(REACTOR)/makefiles/config.mf
+
+
+OBJScc		=	$(SRCS:.cc=.o)
+OBJS		=	$(OBJScc:.c=.o)
+
+DOBJScc		=	$(SRCS:.cc=.do)
+DOBJS		=	$(DOBJScc:.c=.do)
+
+.SUFFIXES:	.cc .c .o .do
+.cc.o:		
+		$(CXX) $(LD_FLAGS) $(CFLAGS) $(BUILD_FLAGS) $(BUILD_NDBG_FLAGS) \
+			-c $< $(INC_DIRS) $(SYS_INC_DIRS)
+.c.o:   
+		$(CC) $(LD_FLAGS) $(CFLAGS) $(BUILD_FLAGS) $(BUILD_NDBG_FLAGS) \
+			-c $< $(INC_DIRS) $(SYS_INC_DIRS)
+
+.cc.do:		
+		$(CXX) -DDEBUG $(LD_FLAGS) $(DBG_CFLAGS) $(BUILD_FLAGS) \
+			$(BUILD_DBG_FLAGS) \
+			-c $< -o $@ $(INC_DIRS) $(SYS_INC_DIRS)
+.c.do:   
+		$(CC) -DDEBUG $(LD_FLAGS) $(DBG_CFLAGS) $(BUILD_FLAGS) \
+			$(BUILD_DBG_FLAGS) \
+			-c $< -o $@ $(INC_DIRS) $(SYS_INC_DIRS)
+
+$(NAME): $(OBJS)
+		ar rcu lib$(NAME).a $(OBJS)
+
+$(NAME).dbg: $(DOBJS)
+		ar rcu lib$(NAME).dbg.a $(DOBJS)
+
+# installation
+
+$(DEST)/include/$(NAME): Makefile
+	mkdir -p $(DEST)/include/$(NAME)
+	cp ../include/* $(DEST)/include/$(NAME)
+	touch $(DEST)/include/$(NAME)
+
+install:		$(NAME) 
+	mkdir -p $(DEST)/lib
+	mv lib$(NAME).a $(DEST)/lib
+
+install.dbg:	$(NAME).dbg
+	mkdir -p $(DEST)/lib
+	mv lib$(NAME).dbg.a $(DEST)/lib
+
+clean:
+		@-echo 'Making clean...'
+		@-rm -f core lib$(NAME).* *.o *.do *.bak *~ #*# 
+

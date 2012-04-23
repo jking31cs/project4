@@ -1,0 +1,37 @@
+#
+# Solaris with gcc
+#
+
+CONFIG = sun-gcc
+
+# --- Compilation --------------------------------------------------------------
+CXX			=	g++
+CC			=	gcc
+LD			=	g++
+MAKEDEP     =   g++ -MM $(SYS_INC_DIRS) $(INC_DIRS) $(SRCS) > Makefile.depend
+CPP			=   gcc -x c -E 
+
+LD_FLAGS	=
+CFLAGS		= 	-O2 -ansi
+DBG_CFLAGS	= 	-g -ansi
+# the -ansi is to stop gcc #defining things like "sun"
+
+# does libtool exist & work?
+SHARED		=	off
+
+config:
+
+# --- System -------------------------------------------------------------------
+SYS_INC_DIRS		=   
+SYS_LIB_DIRS		=   
+SYS_LIBS			=   
+SYS_DBG_LIBS		=   
+X_INC_DIRS			=   -I/usr/X11R6/include
+X_LIB_DIRS			=   -L/usr/X11R6/lib
+X_LIBS				=   -lX11 -lXext -lsocket
+DEST				=	$(REACTOR)
+
+# --- VL -----------------------------------------------------------------------
+CL_EXT_FLAGS = -DCL_TMPL_INST -DRUSAGE_TIME -DANSI_TIME
+VL_EXT_FLAGS = -DVL_HAS_ABSF -DVL_HAS_IEEEFP -DVL_HAS_DRAND
+

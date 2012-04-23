@@ -1,0 +1,66 @@
+# -- program makefile rules ---------------------------------------------------
+
+SHELL		=	/bin/sh
+
+all:	$(NAME)
+debug:	$(NAME).dbg
+
+install: $(NAME)
+	mkdir -p $(DEST)/bin
+	mv $(NAME) $(DEST)/bin
+install.dbg: $(NAME).dbg
+	mkdir -p $(DEST)/bin
+	mv $(NAME).dbg $(DEST)/bin
+
+include ../makefiles/config.mf
+
+OBJScc		=	$(SRCS:.cc=.o)
+OBJScxx		=	$(OBJScc:.cxx=.o)
+OBJS		=	$(OBJScxx:.c=.o)
+
+DOBJScc		=	$(SRCS:.cc=.do)
+DOBJS		=	$(DOBJScc:.c=.do)
+
+$(NAME):		$(OBJS)
+		$(LD) $(LD_FLAGS) $(OBJS) $(LIB_DIRS) $(SYS_LIB_DIRS) \
+			$(SYS_LIBS) $(LIBS) -o $(NAME)
+
+$(NAME).dbg:	$(DOBJS)
+		$(LD) $(LD_FLAGS) $(DOBJS) $(LIB_DIRS) $(SYS_LIB_DIRS) \
+			$(SYS_LIBS) $(DBG_LIBS) -o $(NAME).dbg
+
+.SUFFIXES:	.cc .cxx .c .o .do
+.cc.o:		
+		$(CXX) $(LD_FLAGS) $(CFLAGS) $(BUILD_FLAGS) $(BUILD_NDBG_FLAGS) \
+			-c $< -o $@ $(INC_DIRS) $(SYS_INC_DIRS)
+.cxx.o:		
+		$(CXX) $(LD_FLAGS) $(CFLAGS) $(BUILD_FLAGS) $(BUILD_NDBG_FLAGS) \
+			-c $< -o $@ $(INC_DIRS) $(SYS_INC_DIRS)
+.c.o:   
+		$(CC) $(LD_FLAGS) $(CFLAGS) $(BUILD_FLAGS) $(BUILD_NDBG_FLAGS) \
+			-c $< -o $@ $(INC_DIRS) $(SYS_INC_DIRS)
+
+.cc.do:		
+		$(CXX) -DDEBUG $(LD_FLAGS) $(DBG_CFLAGS) $(BUILD_FLAGS) \
+			$(BUILD_DBG_FLAGS) \
+			-c $< -o $@ $(INC_DIRS) $(SYS_INC_DIRS)
+.cxx.do:
+		$(CXX) -DDEBUG $(LD_FLAGS) $(DBG_CFLAGS) $(BUILD_FLAGS) \
+			$(BUILD_DBG_FLAGS) \
+			-c $< -o $@ $(INC_DIRS) $(SYS_INC_DIRS)
+.c.do:   
+		$(CC) -DDEBUG $(LD_FLAGS) $(DBG_CFLAGS) $(BUILD_FLAGS) \
+			$(BUILD_DBG_FLAGS) \
+			-c $< -o $@ $(INC_DIRS) $(SYS_INC_DIRS)
+
+run:	$(NAME)
+		./$(NAME)
+
+run.dbg:	$(NAME).dbg
+		./$(NAME).dbg
+
+clean:
+		@-echo 'Making clean...'
+		@-rm -f core \
+			$(NAME) $(NAME).dbg \
+			*.o *.do *.bak *~ #*#

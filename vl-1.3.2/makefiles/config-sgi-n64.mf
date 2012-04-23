@@ -1,0 +1,40 @@
+#
+# Irix 6.2 & up, 64-bit
+#
+
+CONFIG = sgi-n64
+
+# --- Compilation --------------------------------------------------------------
+CXX			=	CC
+CC			=	cc
+LD			=	CC # so we get automatic template instantiation
+MAKEDEP		=	makedepend -f Makefile.depend -w0 -- -I/usr/include/CC \
+					$(SYS_INC_DIRS) $(INC_DIRS) -- $(SRCS)
+
+LD_FLAGS    =   -64 -mips4
+CFLAGS		= 	-O2 
+DBG_CFLAGS	= 	-g3 
+
+# does libtool exist & work?
+SHARED		=	off
+
+clean:	sgi_clean
+sgi_clean:
+	@-rm -rf ii_files
+
+config:
+
+# --- System--------------------------------------------------------------------
+SYS_INC_DIRS		=   
+SYS_LIB_DIRS		=   
+SYS_LIBS			=   
+SYS_DBG_LIBS		=   -lmalloc_cv
+X_INC_DIRS			=   
+X_LIB_DIRS			=   
+X_LIBS				=   -lX11 -lXext
+DEST				=	$(REACTOR)
+
+# --- VL -----------------------------------------------------------------------
+CL_EXT_FLAGS = -DCL_SGI_INST -DRUSAGE_TIME -DSGI_TIME
+VL_EXT_FLAGS = -DVL_HAS_ABSF -DVL_HAS_IEEEFP -DVL_HAS_DRAND
+
