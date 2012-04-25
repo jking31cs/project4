@@ -26,7 +26,9 @@
 #include "Transform.h"
 #endif	//__TRANSFORM_H__
 
+#include "My_Math_Lib.h"
 
+using namespace std;
 
 int readSkelFile( FILE* file, ArticulatedBody* skel );
 
@@ -68,6 +70,7 @@ void Solution(void *v)
 {
     cout << "TODO: Solve inverse kinematics problem" << endl;
     bool test = UI->mData->mSelectedModel->mLimbs[0]->mTransforms[0]->IsDof();
+    My_Math_Lib::test();
 }
 
 void Exit(void *v)

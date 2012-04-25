@@ -51,6 +51,7 @@ UTIL_OBJS = \
 	Command.o \
 	Trackball.o \
 	UICallback.o \
+        My_Math_Lib.o \
 	$(NULL)
 
 FUNCTION_OBJS = \
