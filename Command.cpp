@@ -70,7 +70,8 @@ void Solution(void *v)
 {
     cout << "TODO: Solve inverse kinematics problem" << endl;
     bool test = UI->mData->mSelectedModel->mLimbs[0]->mTransforms[0]->IsDof();
-    My_Math_Lib::test();
+    cout << "Time to see my math in action: " << My_Math_Lib::get_c_value() << endl;
+    cout << "Let's check out this Jacobian thing" << My_Math_Lib::computeJacobian() << endl;
 }
 
 void Exit(void *v)
