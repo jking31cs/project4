@@ -53,33 +53,32 @@ class RotateEuler : public Transform
   virtual bool IsDof() { return (mDof!=0); }
   virtual int GetDofCount() { return 1; }
   virtual Dof* GetDof( int dof ) { return mDof; }
-    virtual Mat4d GetDeriv(int dof) {
-        Mat4d toRet;
-        switch (dof) {
-            case 0:
-                toRet[0] = Vec4d(0, 0, 0, 0);
-                toRet[1] = Vec4d(0, -1*sin(mAngle), -1*cos(mAngle), 0);
-                toRet[2] = Vec4d(0, cos(mAngle), -1*sin(mAngle), 0);
-                toRet[3] = Vec4d(0, 0, 0, 0);
-                break;
-            case 1:
-                toRet[0] = Vec4d(-1*sin(mAngle), 0, -1*cos(mAngle), 0);
-                toRet[1] = Vec4d(0, 0, 0, 0);
-                toRet[2] = Vec4d(cos(mAngle), 0, -1*sin(mAngle), 0);
-                toRet[3] = Vec4d(0, 0, 0, 0);
-                break;
-            case 2:
-                
-                toRet[0] = Vec4d(-1*sin(mAngle),-1*cos(mAngle), 0, 0);
-                toRet[1] = Vec4d(cos(mAngle), -1*sin(mAngle), 0, 0);
-                toRet[2] = Vec4d(0, 0, 0, 0);
-                toRet[3] = Vec4d(0, 0, 0, 0);
-                break;
-            default:
-                break;
-        } 
-        return toRet;
-    };
+  virtual Mat4d GetDeriv(int dof) {
+      Mat4d toRet;
+      switch (dof) {
+          case 0:
+              toRet[0] = Vec4d(0, 0, 0, 0);
+              toRet[1] = Vec4d(0, -1*sin(mAngle), -1*cos(mAngle), 0);
+              toRet[2] = Vec4d(0, cos(mAngle), -1*sin(mAngle), 0);
+              toRet[3] = Vec4d(0, 0, 0, 0);
+              break;
+          case 1:
+              toRet[0] = Vec4d(-1*sin(mAngle), 0, -1*cos(mAngle), 0);
+              toRet[1] = Vec4d(0, 0, 0, 0);
+              toRet[2] = Vec4d(cos(mAngle), 0, -1*sin(mAngle), 0);
+              toRet[3] = Vec4d(0, 0, 0, 0);
+              break;
+          case 2:
+              toRet[0] = Vec4d(-1*sin(mAngle),-1*cos(mAngle), 0, 0);
+              toRet[1] = Vec4d(cos(mAngle), -1*sin(mAngle), 0, 0);
+              toRet[2] = Vec4d(0, 0, 0, 0);
+              toRet[3] = Vec4d(0, 0, 0, 0);
+              break;
+          default:
+              break;
+      } 
+      return toRet;
+  };
 
   Vec3d mAxis;
   double mAngle;

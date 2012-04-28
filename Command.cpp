@@ -71,19 +71,35 @@ void LoadModel(void *v)
 void Solution(void *v)
 {
 
-    Matd jacobian = My_Math_Lib::computeJacobian();
-//    cout << "My Jacobian before inverse: " << jacobian << endl;
-    Matd psd = My_Math_Lib::getJacobianPseudoInverse(jacobian);
-  //  cout << "Did that psd thing" << psd << endl;
-    Vec3d delta_c = My_Math_Lib::get_c_value() / 100;
-    Vecd delta_q = psd * delta_c;
-    //cout << "Size of delta_q" << delta_q.Elts() << endl;
-    
-    Vecd current_q = Vecd(UI->mData->mSelectedModel->GetDofCount());
-    UI->mData->mSelectedModel->mDofList.GetDofs(&current_q);
-    
-    Vecd new_q = current_q + delta_q;
-    UI->mData->mSelectedModel->mDofList.SetDofs(new_q);
+    float error = sqrlen(My_Math_Lib::get_c_value());
+    Vec3d delta_c = My_Math_Lib::get_c_value() / 10;
+    while (error > .01) {
+        //cout << error << endl;
+        Matd jacobian = My_Math_Lib::computeJacobian();
+        Matd psd = Matd();
+        //    cout << "My Jacobian before inverse: " << jacobian << endl;
+        try {
+            psd = My_Math_Lib::getJacobianPseudoInverse(jacobian);
+        } catch (exception& e) {
+            cout << "WELL SHIT" << endl;
+            break;
+        }
+        
+        //  cout << "Did that psd thing" << psd << endl;
+        
+        Vecd delta_q = psd * delta_c;
+        //cout << "Size of delta_q" << delta_q.Elts() << endl;
+        
+        Vecd current_q = Vecd(UI->mData->mSelectedModel->GetDofCount());
+        UI->mData->mSelectedModel->mDofList.GetDofs(&current_q);
+        
+        Vecd new_q = current_q + delta_q;
+        UI->mData->mSelectedModel->mDofList.SetDofs(new_q);
+        error = sqrlen(My_Math_Lib::get_c_value());
+
+
+    }
+    cout << "Done with Solution" << endl;
 }
 
 void Exit(void *v)
