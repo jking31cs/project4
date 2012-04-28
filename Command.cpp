@@ -71,9 +71,16 @@ void LoadModel(void *v)
 void Solution(void *v)
 {
     cout << "TODO: Solve inverse kinematics problem" << endl;
-    bool test = UI->mData->mSelectedModel->mLimbs[0]->mTransforms[0]->IsDof();
-    cout << "Time to see my math in action: " << My_Math_Lib::get_c_value() << endl;
-    cout << "Let's check out this Jacobian thing" << My_Math_Lib::computeJacobian() << endl;
+    Matd jacobian = My_Math_Lib::computeJacobian();
+    Matd psd = My_Math_Lib::getJacobianPseudoInverse(jacobian);
+    Vec3d delta_c = My_Math_Lib::get_c_value() / 100;
+    Vecd delta_q = psd * delta_c;
+    Vecd current_q = Vecd();
+    for (int i = 0; i < UI->mData->mSelectedModel->GetDofCount(); i++) {
+        current_q[i] = UI->mData->mSelectedModel->mDofList.GetDof(i);
+    }
+    Vecd new_q = current_q + delta_q;
+    UI->mData->mSelectedModel->mDofList.SetDofs(new_q);
 }
 
 void Exit(void *v)

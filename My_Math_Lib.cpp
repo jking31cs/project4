@@ -29,13 +29,13 @@ Matd My_Math_Lib::computeJacobian() {
     Model* selectedModel =  UI->mData->mSelectedModel;
     Matd J = Matd(selectedModel->GetDofCount(),3);
     Marker* mark = selectedModel->mHandleList[0];
-    for (int nodeIndex = 0; nodeIndex < selectedModel->GetNodeCount(); nodeIndex++) {
+    for (int nodeIndex = selectedModel->GetNodeCount() -1; nodeIndex >= 0; nodeIndex--) {
         TransformNode* node = selectedModel->mLimbs[nodeIndex];
         Mat4d parent = node->mParentTransform;
         Mat4d t = node->mTransforms[0]->GetTransform();
         //Go through each rotational transform and set the J[column]
-        int derivIndex = 1;
-        while (derivIndex < node->GetSize()) {
+        int derivIndex = node->GetSize() - 1;
+        while (derivIndex > 0) {
             Mat4d rotationMatrices = vl_I; //Represents all the rotation matrices (including derivative one) multiplied together
             for (int transformIndex = 0; transformIndex < node->GetSize(); transformIndex++) {
                 if (transformIndex == derivIndex-1) {
@@ -53,7 +53,7 @@ Matd My_Math_Lib::computeJacobian() {
             int column = dof->mId;
             J[column] = Vec3d(J_i[0], J_i[1], J_i[2]);
             
-            derivIndex++;
+            derivIndex--;   
         }
     }
     return trans(J);
@@ -61,5 +61,8 @@ Matd My_Math_Lib::computeJacobian() {
 
 Matd My_Math_Lib::getJacobianPseudoInverse(Matd jacobianMatrix) {
     Matd Jt_times_J = trans(jacobianMatrix) * jacobianMatrix;
-    return inv(Jt_times_J) * trans(jacobianMatrix);
+    cout << "My supposedly square matrix: " << Jt_times_J.Rows() << " rows and " << Jt_times_J.Cols() << " Columns" << endl;
+    cout << "My Jacobian is " << jacobianMatrix << endl;
+    Matd temp = inv(Jt_times_J);
+    return temp * trans(jacobianMatrix);
 }
