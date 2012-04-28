@@ -7,6 +7,7 @@
 #include "C3dFileInfo.h"
 #include "Transform.h"
 #include "TransformNode.h"
+#include "Dof.h"
 
 using namespace std;
 
@@ -25,21 +26,35 @@ Vec3d My_Math_Lib::get_c_value() {
 
 //TODO Fix this so that it is correct.
 Matd My_Math_Lib::computeJacobian() {
-    Matd J = Matd(UI->mData->mSelectedModel->GetDofCount(),3);
-    Marker* mark = UI->mData->mSelectedModel->mHandleList[0];
-    for (int i = 0; i < UI->mData->mSelectedModel->GetDofCount() - 1; i++) {
-        TransformNode* node = UI->mData->mSelectedModel->mLimbs[mark->mNodeIndex];
+    Model* selectedModel =  UI->mData->mSelectedModel;
+    Matd J = Matd(selectedModel->GetDofCount(),3);
+    Marker* mark = selectedModel->mHandleList[0];
+    for (int nodeIndex = 0; nodeIndex < selectedModel->GetNodeCount(); nodeIndex++) {
+        TransformNode* node = selectedModel->mLimbs[nodeIndex];
         Mat4d parent = node->mParentTransform;
-        cout << "Parent: " << parent << endl;
         Mat4d t = node->mTransforms[0]->GetTransform();
-        Mat4d dr_dq = node->mTransforms[1]->GetDeriv(i);
-        Mat4d r = node->mTransforms[2]->GetTransform();
-        Vec4d offset = Vec4d(mark->mOffset, 1);
-        Vec4d J_i = parent * t * dr_dq * r * offset;
-        int column = node->mTransforms[1]->GetDof(i)->mId;
-        cout << "What is the size of J[i]? " << J[i] << endl;
-        J[column] = Vec3d(J_i[0], J_i[1], J_i[2]);
-        cout << "Got column: " << i << endl;
+        //Go through each rotational transform and set the J[column]
+        int derivIndex = 1;
+        while (derivIndex < node->GetSize()) {
+            Mat4d rotationMatrices = Mat4d(); //Represents all the rotation matrices (including derivative one) multiplied together
+            for (int transformIndex = 0; transformIndex < node->GetSize(); transformIndex++) {
+                if (transformIndex == derivIndex-1) {
+                    rotationMatrices *= node->mTransforms[transformIndex]->GetDeriv(transformIndex);
+                } else {
+                    rotationMatrices *= node->mTransforms[transformIndex]->GetTransform();
+                }
+            }
+            Vec4d offset = Vec4d(mark->mOffset, 1);
+            for (int otherNodeIndex = selectedModel->GetNodeCount() -1; otherNodeIndex > nodeIndex; otherNodeIndex--) {
+                offset = selectedModel->mLimbs[otherNodeIndex]->mCurrentTransform * offset;
+            }
+            Vec4d J_i = parent*t*rotationMatrices*offset;
+            Dof* dof = node->mTransforms[derivIndex]->GetDof(derivIndex-1);
+            int column = dof->mId;
+            J[column] = Vec3d(J_i[0], J_i[1], J_i[2]);
+            
+            derivIndex++;
+        }
     }
     return trans(J);
 }
