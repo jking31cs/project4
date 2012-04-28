@@ -5,4 +5,5 @@ class My_Math_Lib {
         static float test();
         static Vec3d get_c_value();
         static Matd computeJacobian();
+    static Matd getJacobianPseudoInverse(Matd jacobianMatrix);
 };

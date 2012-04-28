@@ -64,6 +64,8 @@ void LoadModel(void *v)
   UI->mGLWindow->refresh();
   
   cout << "number of dofs in model: " << UI->mData->mModels[0]->GetDofCount() << endl;
+  cout << "number of nodes: " << UI->mData->mModels[0]->GetNodeCount() << endl;
+  cout << "number of handles: " << UI->mData->mModels[0]->GetHandleCount() << endl;
 }
 
 void Solution(void *v)

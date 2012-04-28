@@ -51,6 +51,9 @@ class RotateEuler : public Transform
   virtual bool IsDof() { return (mDof!=0); }
   virtual int GetDofCount() { return 1; }
   virtual Dof* GetDof( int dof ) { return mDof; }
+    virtual Mat4d GetDeriv(int dof) {
+        return Mat4d(); 
+    };
 
   Vec3d mAxis;
   double mAngle;
