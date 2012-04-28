@@ -70,23 +70,20 @@ void LoadModel(void *v)
 
 void Solution(void *v)
 {
-    cout << "TODO: Solve inverse kinematics problem" << endl;
+
     Matd jacobian = My_Math_Lib::computeJacobian();
-    cout << "My Jacobian before inverse: " << jacobian << endl;
+//    cout << "My Jacobian before inverse: " << jacobian << endl;
     Matd psd = My_Math_Lib::getJacobianPseudoInverse(jacobian);
-    cout << "Did that psd thing" << psd << endl;
+  //  cout << "Did that psd thing" << psd << endl;
     Vec3d delta_c = My_Math_Lib::get_c_value() / 100;
     Vecd delta_q = psd * delta_c;
-    cout << "Size of delta_q" << delta_q.Elts() << endl;
+    //cout << "Size of delta_q" << delta_q.Elts() << endl;
     
-    Vecd current_q = Vecd();
-    // UI->mData->mSelectedModel->mDofList.GetDofs(&current_q);
-    cout << "What is q? " << current_q << endl;
-//    for (int i = 0; i < UI->mData->mSelectedModel->GetDofCount(); i++) {
-//        current_q[i] = UI->mData->mSelectedModel->mDofList.GetDof(i);
-//    }
-//    Vecd new_q = current_q + delta_q;
-//    UI->mData->mSelectedModel->mDofList.SetDofs(new_q);
+    Vecd current_q = Vecd(UI->mData->mSelectedModel->GetDofCount());
+    UI->mData->mSelectedModel->mDofList.GetDofs(&current_q);
+    
+    Vecd new_q = current_q + delta_q;
+    UI->mData->mSelectedModel->mDofList.SetDofs(new_q);
 }
 
 void Exit(void *v)
