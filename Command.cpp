@@ -72,8 +72,9 @@ void Solution(void *v)
 {
 
     float error = sqrlen(My_Math_Lib::get_c_value());
-    Vec3d delta_c = My_Math_Lib::get_c_value() / 10;
-    while (error > .01) {
+    Vec3d delta_c = My_Math_Lib::get_c_value();
+    cout << "my error" << error << endl;
+    while (error > .001) {
         //cout << error << endl;
         Matd jacobian = My_Math_Lib::computeJacobian();
         Matd psd = Matd();
@@ -82,22 +83,35 @@ void Solution(void *v)
             psd = My_Math_Lib::getJacobianPseudoInverse(jacobian);
         } catch (exception& e) {
             cout << "WELL SHIT" << endl;
-            break;
+           // break;
         }
         
         //  cout << "Did that psd thing" << psd << endl;
+        
         
         Vecd delta_q = psd * delta_c;
         //cout << "Size of delta_q" << delta_q.Elts() << endl;
         
         Vecd current_q = Vecd(UI->mData->mSelectedModel->GetDofCount());
+        
         UI->mData->mSelectedModel->mDofList.GetDofs(&current_q);
         
-        Vecd new_q = current_q + delta_q;
-        UI->mData->mSelectedModel->mDofList.SetDofs(new_q);
-        error = sqrlen(My_Math_Lib::get_c_value());
-
-
+        bool isCloser = false;
+        float alpha = .1;
+        while (!isCloser) {
+            Vecd new_q = current_q + alpha * delta_q;
+            UI->mData->mSelectedModel->SetDofs(new_q);
+            float temp_error = sqrlen(My_Math_Lib::get_c_value());
+            if (temp_error < error) {
+                error = temp_error;
+                isCloser = true;
+            } else {
+                alpha = alpha - .01;
+            }
+        }
+        cout << "My Error is " << error << endl;
+        Vec3d new_delta_c = My_Math_Lib::get_c_value();
+        delta_c = new_delta_c;
     }
     cout << "Done with Solution" << endl;
 }

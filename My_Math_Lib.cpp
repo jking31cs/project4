@@ -44,24 +44,24 @@ Matd My_Math_Lib::computeJacobian() {
                     rotationMatrices *= node->mTransforms[transformIndex]->GetTransform();
                 }
             }
-            cout << "rotation matrices: " << rotationMatrices << endl;
+            //cout << "rotation matrices: " << rotationMatrices << endl;
             Vec4d offset = Vec4d(mark->mOffset, 1);
             for (int otherNodeIndex = selectedModel->GetNodeCount() -1; otherNodeIndex > nodeIndex; otherNodeIndex--) {
                 offset = selectedModel->mLimbs[otherNodeIndex]->mCurrentTransform * offset;
             }
-            cout << "offset: " << offset << endl; 
+            //cout << "offset: " << offset << endl; 
             Vec4d J_i = parent*t*rotationMatrices*offset;
             Dof* dof = node->mTransforms[derivIndex]->GetDof(derivIndex-1);
             int column = dof->mId;
             
-            cout << "new column: " << column << endl;
+            //cout << "new column: " << column << endl;
             
             J[column] = Vec3d(J_i[0], J_i[1], J_i[2]);
             
             derivIndex++;   
         }
     }
-    cout << "My Jacobian fresh from calculating: " << J << endl; 
+    //cout << "My Jacobian fresh from calculating: " << J << endl; 
     return trans(J);
 }
 
