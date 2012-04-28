@@ -36,7 +36,7 @@ Matd My_Math_Lib::computeJacobian() {
         //Go through each rotational transform and set the J[column]
         int derivIndex = 1;
         while (derivIndex < node->GetSize()) {
-            Mat4d rotationMatrices = Mat4d(); //Represents all the rotation matrices (including derivative one) multiplied together
+            Mat4d rotationMatrices = vl_I; //Represents all the rotation matrices (including derivative one) multiplied together
             for (int transformIndex = 0; transformIndex < node->GetSize(); transformIndex++) {
                 if (transformIndex == derivIndex-1) {
                     rotationMatrices *= node->mTransforms[transformIndex]->GetDeriv(transformIndex);
