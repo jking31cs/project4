@@ -70,24 +70,17 @@ void LoadModel(void *v)
 
 void Solution(void *v)
 {
-
-    float error = sqrlen(My_Math_Lib::get_c_value());
-    Vec3d delta_c = My_Math_Lib::get_c_value();
-    cout << "my error" << error << endl;
-    while (error > .001) {
+    
+    float F = 0;
+    for (int i = 0; i < UI->mData->mSelectedModel->GetHandleCount(); i++) {
+        F += sqrlen(My_Math_Lib::get_c_value(i));
+    }
+    cout << "my error" << F << endl;
+    while (F > .001) {
         //cout << error << endl;
+        Vec3d delta_c = My_Math_Lib::get_c_value(0);
         Matd jacobian = My_Math_Lib::computeJacobian();
-        Matd psd = Matd();
-        //    cout << "My Jacobian before inverse: " << jacobian << endl;
-        try {
-            psd = My_Math_Lib::getJacobianPseudoInverse(jacobian);
-        } catch (exception& e) {
-            cout << "WELL SHIT" << endl;
-           // break;
-        }
-        
-        //  cout << "Did that psd thing" << psd << endl;
-        
+        Matd psd = My_Math_Lib::getJacobianPseudoInverse(jacobian);
         
         Vecd delta_q = psd * delta_c;
         //cout << "Size of delta_q" << delta_q.Elts() << endl;
@@ -104,17 +97,18 @@ void Solution(void *v)
                 new_q[i] = fmod(new_q[i], 2*2*acos(0.0));
             }
             UI->mData->mSelectedModel->SetDofs(new_q);
-            float temp_error = sqrlen(My_Math_Lib::get_c_value());
-            if (temp_error < error) {
-                error = temp_error;
+            float temp_error = 0;
+            for (int i = 0; i < UI->mData->mSelectedModel->GetHandleCount(); i++) {
+                temp_error += sqrlen(My_Math_Lib::get_c_value(i));
+            }
+            if (temp_error < F) {
+                F = temp_error;
                 isCloser = true;
             } else {
                 alpha = alpha - .01;
             }
         }
-        cout << "My Error is " << error << endl;
-        Vec3d new_delta_c = My_Math_Lib::get_c_value();
-        delta_c = new_delta_c;
+        cout << "My Error is " << F << endl;
     }
     cout << "Done with Solution" << endl;
 }

@@ -18,9 +18,9 @@ float My_Math_Lib::test() {
     return 1.f;
 }
 
-Vec3d My_Math_Lib::get_c_value() {
-    Marker* mark = UI->mData->mSelectedModel->mHandleList[0];
-    Vec3d p_line = UI->mData->mSelectedModel->mOpenedC3dFile->GetMarkerPos(0,0);
+Vec3d My_Math_Lib::get_c_value(int handleIndex) {
+    Marker* mark = UI->mData->mSelectedModel->mHandleList[handleIndex];
+    Vec3d p_line = UI->mData->mSelectedModel->mOpenedC3dFile->GetMarkerPos(0,handleIndex);
     return mark->mGlobalPos - p_line;
 }
 

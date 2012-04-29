@@ -57,9 +57,11 @@ class C3dFileInfo
   }
 
   void LoadFile();
+    
   Vec3d GetMarkerPos(int frameIndex, int markerIndex){
     return mMarkerPos[frameIndex * mNumHandles + markerIndex];
   }
+    
   void SetMarkerPos(int frameIndex, int markerIndex, Vec3d pos){
     mMarkerPos[frameIndex * mNumHandles + markerIndex] = pos;
   }
