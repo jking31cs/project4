@@ -27,7 +27,7 @@ Vec3d My_Math_Lib::get_c_value() {
 //TODO Fix this so that it is correct.
 Matd My_Math_Lib::computeJacobian() {
     Model* selectedModel =  UI->mData->mSelectedModel;
-    Matd J = Matd(selectedModel->GetDofCount(),3);
+    Matd J = Matd(3 * selectedModel->GetHandleCount(), selectedModel->GetDofCount());
     for (int handleIndex = 0; handleIndex < selectedModel->GetHandleCount(); handleIndex++) {
         Marker* mark = selectedModel->mHandleList[handleIndex];
         TransformNode* node = selectedModel->mLimbs[mark->mNodeIndex];
@@ -39,7 +39,7 @@ Matd My_Math_Lib::computeJacobian() {
             while (derivIndex < node->GetSize()) {
                 Mat4d rotationMatrices = vl_I; //Represents all the rotation matrices (including derivative one) multiplied together
                 for (int transformIndex = 1; transformIndex < node->GetSize(); transformIndex++) {
-                    if (transformIndex == derivIndex-1) {
+                    if (transformIndex == derivIndex) {
                         rotationMatrices *= node->mTransforms[transformIndex]->GetDeriv(transformIndex);
                     } else {
                         rotationMatrices *= node->mTransforms[transformIndex]->GetTransform();
@@ -47,8 +47,10 @@ Matd My_Math_Lib::computeJacobian() {
                 }
                 //cout << "rotation matrices: " << rotationMatrices << endl;
                 Vec4d offset = Vec4d(mark->mOffset, 1);
-                for (int otherNodeIndex = 0; otherNodeIndex < node->GetChildrenCount(); otherNodeIndex++) {
-                    offset = node->mChildren[otherNodeIndex]->mCurrentTransform * offset;
+                TransformNode* offsetNode = selectedModel->mLimbs[mark->mNodeIndex];
+                while (offsetNode != node) {
+                    offset = offsetNode->mLocalTransform * offset;
+                    offsetNode = offsetNode->mParentNode; 
                 }
                 //cout << "offset: " << offset << endl; 
                 Vec4d J_i = parent*t*rotationMatrices*offset;
@@ -57,7 +59,11 @@ Matd My_Math_Lib::computeJacobian() {
                 
                 cout << "new column: " << column << endl;
                 
-                J[column] = Vec3d(J_i[0], J_i[1], J_i[2]);
+                int rowIndex = 3*handleIndex;
+                
+                J[rowIndex][column] = J_i[0];
+                J[rowIndex+1][column] = J_i[1];
+                J[rowIndex+2][column] = J_i[2];
                 
                 derivIndex++;   
             }
@@ -66,7 +72,7 @@ Matd My_Math_Lib::computeJacobian() {
     }
     
     cout << "My Jacobian fresh from calculating: " << J << endl; 
-    return trans(J);
+    return J;
 }
 
 Matd My_Math_Lib::getJacobianPseudoInverse(Matd jacobianMatrix) {
