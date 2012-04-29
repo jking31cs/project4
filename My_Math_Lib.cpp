@@ -28,45 +28,50 @@ Vec3d My_Math_Lib::get_c_value() {
 Matd My_Math_Lib::computeJacobian() {
     Model* selectedModel =  UI->mData->mSelectedModel;
     Matd J = Matd(selectedModel->GetDofCount(),3);
-    Marker* mark = selectedModel->mHandleList[0];
-    for (int nodeIndex = selectedModel->GetNodeCount() -1; nodeIndex >= 0; nodeIndex--) {
-        TransformNode* node = selectedModel->mLimbs[nodeIndex];
-        Mat4d parent = node->mParentTransform;
-        Mat4d t = node->mTransforms[0]->GetTransform();
-        //Go through each rotational transform and set the J[column]
-        int derivIndex = 1;
-        while (derivIndex < node->GetSize()) {
-            Mat4d rotationMatrices = vl_I; //Represents all the rotation matrices (including derivative one) multiplied together
-            for (int transformIndex = 1; transformIndex < node->GetSize(); transformIndex++) {
-                if (transformIndex == derivIndex-1) {
-                    rotationMatrices *= node->mTransforms[transformIndex]->GetDeriv(transformIndex);
-                } else {
-                    rotationMatrices *= node->mTransforms[transformIndex]->GetTransform();
+    for (int handleIndex = 0; handleIndex < selectedModel->GetHandleCount(); handleIndex++) {
+        Marker* mark = selectedModel->mHandleList[handleIndex];
+        TransformNode* node = selectedModel->mLimbs[mark->mNodeIndex];
+        while (node != NULL) {
+            Mat4d parent = node->mParentTransform;
+            Mat4d t = node->mTransforms[0]->GetTransform();
+            //Go through each rotational transform and set the J[column]
+            int derivIndex = 1;
+            while (derivIndex < node->GetSize()) {
+                Mat4d rotationMatrices = vl_I; //Represents all the rotation matrices (including derivative one) multiplied together
+                for (int transformIndex = 1; transformIndex < node->GetSize(); transformIndex++) {
+                    if (transformIndex == derivIndex-1) {
+                        rotationMatrices *= node->mTransforms[transformIndex]->GetDeriv(transformIndex);
+                    } else {
+                        rotationMatrices *= node->mTransforms[transformIndex]->GetTransform();
+                    }
                 }
+                //cout << "rotation matrices: " << rotationMatrices << endl;
+                Vec4d offset = Vec4d(mark->mOffset, 1);
+                for (int otherNodeIndex = 0; otherNodeIndex < node->GetChildrenCount(); otherNodeIndex++) {
+                    offset = node->mChildren[otherNodeIndex]->mCurrentTransform * offset;
+                }
+                //cout << "offset: " << offset << endl; 
+                Vec4d J_i = parent*t*rotationMatrices*offset;
+                Dof* dof = node->mTransforms[derivIndex]->GetDof(derivIndex-1);
+                int column = dof->mId;
+                
+                //cout << "new column: " << column << endl;
+                
+                J[column] = Vec3d(J_i[0], J_i[1], J_i[2]);
+                
+                derivIndex++;   
             }
-            //cout << "rotation matrices: " << rotationMatrices << endl;
-            Vec4d offset = Vec4d(mark->mOffset, 1);
-            for (int otherNodeIndex = selectedModel->GetNodeCount() -1; otherNodeIndex > nodeIndex; otherNodeIndex--) {
-                offset = selectedModel->mLimbs[otherNodeIndex]->mCurrentTransform * offset;
-            }
-            //cout << "offset: " << offset << endl; 
-            Vec4d J_i = parent*t*rotationMatrices*offset;
-            Dof* dof = node->mTransforms[derivIndex]->GetDof(derivIndex-1);
-            int column = dof->mId;
-            
-            //cout << "new column: " << column << endl;
-            
-            J[column] = Vec3d(J_i[0], J_i[1], J_i[2]);
-            
-            derivIndex++;   
+            node = node->mParentNode;
         }
     }
-    //cout << "My Jacobian fresh from calculating: " << J << endl; 
+    
+    cout << "My Jacobian fresh from calculating: " << J << endl; 
     return trans(J);
 }
 
 Matd My_Math_Lib::getJacobianPseudoInverse(Matd jacobianMatrix) {
     Matd Jt_times_J = trans(jacobianMatrix) * jacobianMatrix;
+    cout << "My Jacobian Transpose times Jacobian: " << Jt_times_J << endl; 
     Matd temp = inv(Jt_times_J);
     return temp * trans(jacobianMatrix);
 }

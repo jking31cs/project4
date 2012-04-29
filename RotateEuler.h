@@ -57,22 +57,22 @@ class RotateEuler : public Transform
       Mat4d toRet;
       switch (dof) {
           case 0:
-              toRet[0] = Vec4d(0, 0, 0, 0);
-              toRet[1] = Vec4d(0, -1*sin(mAngle), -1*cos(mAngle), 0);
-              toRet[2] = Vec4d(0, cos(mAngle), -1*sin(mAngle), 0);
-              toRet[3] = Vec4d(0, 0, 0, 0);
+              toRet[0] = Vec4d(0.0, 0.0, 0.0, 0.0);
+              toRet[1] = Vec4d(0.0, -1.0*sin(mAngle), -1.0*cos(mAngle), 0.0);
+              toRet[2] = Vec4d(0.0, cos(mAngle), -1.0*sin(mAngle), 0.0);
+              toRet[3] = Vec4d(0.0, 0.0, 0.0, 0.0);
               break;
           case 1:
-              toRet[0] = Vec4d(-1*sin(mAngle), 0, -1*cos(mAngle), 0);
-              toRet[1] = Vec4d(0, 0, 0, 0);
-              toRet[2] = Vec4d(cos(mAngle), 0, -1*sin(mAngle), 0);
-              toRet[3] = Vec4d(0, 0, 0, 0);
+              toRet[0] = Vec4d(-1*sin(mAngle), 0.0, -1*cos(mAngle), 0.0);
+              toRet[1] = Vec4d(0.0, 0.0, 0.0, 0.0);
+              toRet[2] = Vec4d(cos(mAngle), 0.0, -1*sin(mAngle), 0.0);
+              toRet[3] = Vec4d(0.0, 0.0, 0.0, 0.0);
               break;
           case 2:
-              toRet[0] = Vec4d(-1*sin(mAngle),-1*cos(mAngle), 0, 0);
-              toRet[1] = Vec4d(cos(mAngle), -1*sin(mAngle), 0, 0);
-              toRet[2] = Vec4d(0, 0, 0, 0);
-              toRet[3] = Vec4d(0, 0, 0, 0);
+              toRet[0] = Vec4d(-1*sin(mAngle),-1*cos(mAngle), 0.0, 0.0);
+              toRet[1] = Vec4d(cos(mAngle), -1*sin(mAngle), 0.0, 0.0);
+              toRet[2] = Vec4d(0.0, 0.0, 0.0, 0.0);
+              toRet[3] = Vec4d(0.0, 0.0, 0.0, 0.0);
               break;
           default:
               break;

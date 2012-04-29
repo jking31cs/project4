@@ -26,7 +26,7 @@ class TransformNode : public Node
   TransformNode( char* name, Node* child, Transform* t1=0 ... );
   TransformNode(char* name);
 		
-  void AddChild( Node* child ){ 
+  void AddChild( TransformNode* child ){ 
     mChildren.push_back(child); 
     std::vector<int> *newVec = new std::vector<int>; 
   }
@@ -34,6 +34,7 @@ class TransformNode : public Node
   void AddTransform( Transform* t ) { mTransforms.push_back( t ); }
   void AddPrimitive( Node* p ) { mPrimitive.push_back( p ); }
   int  GetSize(){return mTransforms.size(); }
+  int  GetChildrenCount(){return mChildren.size(); }
   virtual void UpdateUpMatrix(Mat4d currTransform, Mat4d InvHeadMatrix); // update all the transformation chains
   char* GetName() { return mName; }
 
@@ -51,7 +52,7 @@ class TransformNode : public Node
   Mat4d mLocalTransform; // local transformations (including fixed translation from the parent node); updated by SetDofs()
   Mat4d mCurrentTransform; // mParentTransform * mLocalTransform; updated by SetDofs()
   std::vector<Transform*> mTransforms; // list of pointers to transformations associated with this node
-  std::vector<Node*> mChildren; // list of pointers to children nodes
+  std::vector<TransformNode*> mChildren; // list of pointers to children nodes
   std::vector<Node *> mPrimitive; 
   std::vector<Marker *> mHandles; // list of handles on this node
   double *mMass;
