@@ -52,10 +52,10 @@ Matd My_Math_Lib::computeJacobian() {
                 }
                 //cout << "offset: " << offset << endl; 
                 Vec4d J_i = parent*t*rotationMatrices*offset;
-                Dof* dof = node->mTransforms[derivIndex]->GetDof(derivIndex-1);
+                Dof* dof = node->mTransforms[derivIndex]->GetDof(0);
                 int column = dof->mId;
                 
-                //cout << "new column: " << column << endl;
+                cout << "new column: " << column << endl;
                 
                 J[column] = Vec3d(J_i[0], J_i[1], J_i[2]);
                 
@@ -71,7 +71,7 @@ Matd My_Math_Lib::computeJacobian() {
 
 Matd My_Math_Lib::getJacobianPseudoInverse(Matd jacobianMatrix) {
     Matd Jt_times_J = trans(jacobianMatrix) * jacobianMatrix;
-    cout << "My Jacobian Transpose times Jacobian: " << Jt_times_J << endl; 
+    cout << "My Jacobian Transpose times Jacobian: " << Jt_times_J << endl;
     Matd temp = inv(Jt_times_J);
     return temp * trans(jacobianMatrix);
 }
