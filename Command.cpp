@@ -76,13 +76,24 @@ void Solution(void *v)
         F += sqrlen(My_Math_Lib::get_c_value(i));
     }
     cout << "my error" << F << endl;
-    while (F > .001) {
+    float my_Goal = .001 * pow(UI->mData->mSelectedModel->GetHandleCount(), 2);
+    while (F > my_Goal) {
         //cout << error << endl;
-        Vec3d delta_c = My_Math_Lib::get_c_value(0);
-        Matd jacobian = My_Math_Lib::computeJacobian();
-        Matd psd = My_Math_Lib::getJacobianPseudoInverse(jacobian);
-        
-        Vecd delta_q = psd * delta_c;
+        Vecd dF_dq = Vecd(UI->mData->mSelectedModel->GetDofCount());
+        cout << "Starting for loop for dF_dq" << endl;
+        for (int handleIndex = 0; handleIndex < UI->mData->mSelectedModel->GetHandleCount(); handleIndex++) {
+            cout<< "On handle #" << handleIndex << endl;
+            Vec3d delta_c = My_Math_Lib::get_c_value(handleIndex);
+            Matd jacobian = My_Math_Lib::computeJacobian(handleIndex);
+            //Matd psd = My_Math_Lib::getJacobianPseudoInverse(jacobian);
+            dF_dq += 2 * (trans(jacobian) * delta_c);
+        }
+        cout<< "Done with for loop" << endl;
+//        Vec3d delta_c = My_Math_Lib::get_c_value(0);
+//        Matd jacobian = My_Math_Lib::computeJacobian(0);
+//        Matd psd = My_Math_Lib::getJacobianPseudoInverse(jacobian);
+//        
+//        Vecd delta_q = psd * delta_c;
         //cout << "Size of delta_q" << delta_q.Elts() << endl;
         
         Vecd current_q = Vecd(UI->mData->mSelectedModel->GetDofCount());
@@ -90,9 +101,10 @@ void Solution(void *v)
         UI->mData->mSelectedModel->mDofList.GetDofs(&current_q);
         
         bool isCloser = false;
-        float alpha = .1;
+        float alpha = 1;
         while (!isCloser) {
-            Vecd new_q = current_q + alpha * delta_q;
+            
+            Vecd new_q = current_q - alpha * dF_dq;
             for (int i=0; i < new_q.Elts(); i++) {
                 new_q[i] = fmod(new_q[i], 2*2*acos(0.0));
             }
@@ -105,7 +117,7 @@ void Solution(void *v)
                 F = temp_error;
                 isCloser = true;
             } else {
-                alpha = alpha - .01;
+                alpha = alpha - .1;
             }
         }
         cout << "My Error is " << F << endl;
