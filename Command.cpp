@@ -77,25 +77,37 @@ void Solution(void *v)
     while (error > .001) {
         //cout << error << endl;
         Matd jacobian = My_Math_Lib::computeJacobian();
-        Matd psd = My_Math_Lib::getJacobianPseudoInverse(jacobian);
-        cout << "My PSD is :" << psd << endl;
+        Matd psd = Matd();
+        //    cout << "My Jacobian before inverse: " << jacobian << endl;
+        try {
+            psd = My_Math_Lib::getJacobianPseudoInverse(jacobian);
+        } catch (exception& e) {
+            cout << "WELL SHIT" << endl;
+           // break;
+        }
+        
+        //  cout << "Did that psd thing" << psd << endl;
+        
+        
         Vecd delta_q = psd * delta_c;
-        cout << "My delta_q: " << delta_q << endl;
+        //cout << "Size of delta_q" << delta_q.Elts() << endl;
         
         Vecd current_q = Vecd(UI->mData->mSelectedModel->GetDofCount());
         
         UI->mData->mSelectedModel->mDofList.GetDofs(&current_q);
         
         bool isCloser = false;
-        float alpha = .5;
+        float alpha = .1;
         while (!isCloser) {
             Vecd new_q = current_q + alpha * delta_q;
+            for (int i=0; i < new_q.Elts(); i++) {
+                new_q[i] = fmod(new_q[i], 2*2*acos(0.0));
+            }
             UI->mData->mSelectedModel->SetDofs(new_q);
             float temp_error = sqrlen(My_Math_Lib::get_c_value());
             if (temp_error < error) {
                 error = temp_error;
                 isCloser = true;
-                cout << "My New q = " << new_q << endl;
             } else {
                 alpha = alpha - .01;
             }

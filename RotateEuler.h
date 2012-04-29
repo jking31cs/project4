@@ -55,14 +55,7 @@ class RotateEuler : public Transform
   virtual Dof* GetDof( int dof ) { return mDof; }
   virtual Mat4d GetDeriv(int dof) {
       Mat4d toRet;
-      int axis;
-      if(mAxis[0])
-          axis = 0;
-      else if(mAxis[1])
-          axis = 1;
-      else if(mAxis[2])
-          axis  = 2;
-      switch (axis) {
+      switch (dof) {
           case 0:
               toRet[0] = Vec4d(0.0, 0.0, 0.0, 0.0);
               toRet[1] = Vec4d(0.0, -1.0*sin(mAngle), -1.0*cos(mAngle), 0.0);
