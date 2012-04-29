@@ -47,7 +47,32 @@ class Translate : public Transform
   // from Transform
   virtual void Apply(); 
   virtual Mat4d GetTransform();
-    virtual Mat4d GetDeriv(int dof) { return Mat4d(); };
+  virtual Mat4d GetDeriv(int dof) { 
+      Mat4d toRet;
+      switch (dof) {
+          case 0:
+              toRet[0] = Vec4d(0.0, 0.0, 0.0, 1.0);
+              toRet[1] = Vec4d(0.0, 0.0, 0,0, 0.0);
+              toRet[2] = Vec4d(0.0, 0.0, 0.0, 0.0);
+              toRet[3] = Vec4d(0.0, 0.0, 0.0, 0.0);
+              break;
+          case 1:
+              toRet[0] = Vec4d(0.0, 0.0, 0.0, 0.0);
+              toRet[1] = Vec4d(0.0, 0.0, 0.0, 1.0);
+              toRet[2] = Vec4d(0.0, 0.0, 0.0, 0.0);
+              toRet[3] = Vec4d(0.0, 0.0, 0.0, 0.0);
+              break;
+          case 2:
+              toRet[0] = Vec4d(0.0, 0.0, 0.0, 0.0);
+              toRet[1] = Vec4d(0.0, 0.0, 0.0, 0.0);
+              toRet[2] = Vec4d(0.0, 0.0, 0.0, 1.0);
+              toRet[3] = Vec4d(0.0, 0.0, 0.0, 0.0);
+              break;
+          default:
+              break;
+      } 
+      return toRet;
+  };
         
   virtual bool IsDof() { return (mDofs[0]!= 0); }
   virtual int GetDofCount() { return 3; }

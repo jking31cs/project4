@@ -34,5 +34,4 @@ void DofList::GetDofs(Vecd *data)
 
 double DofList::GetDof(int index)
 {
-    return mDofs[index]->GetTransformValue();
-}
+    return mDofs[index]->GetTransformValue();}
