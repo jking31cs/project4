@@ -6,6 +6,8 @@
 #include "PhylterGLWindow.h"
 #endif	//__PHYLTERFLGLWINDOW_H__
 #include <time.h>
+#include "PhowardData.h"
+#include "Model.h"
 
 static double TICK = 0.02;
 
@@ -14,8 +16,10 @@ RealTimeIKUI *UI;
 void onTimer(void *)
 {
 
-  if(UI->mPlay_but->value())
-    UI->Increment();
+    if(UI->mPlay_but->value()){
+        UI->mData->mSelectedModel->SetDofs(UI->mData->mSelectedModel->storedQValues[UI->mFrameCounter_cou->value() + 1]);
+        UI->Increment();
+    }
       
   UI->mGLWindow->refresh();
   

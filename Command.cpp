@@ -120,6 +120,7 @@ void Solution(void *v)
                     temp_error += sqrlen(My_Math_Lib::get_c_value(i, frame));
                 }
                 if (temp_error < F) {
+                    UI->mData->mSelectedModel->storedQValues.push_back(new_q);
                     F = temp_error;
                     isCloser = true;
                 } else {
@@ -134,6 +135,7 @@ void Solution(void *v)
             cout << "My Error is " << F << endl;
         }
         UI->mData->mSelectedModel->DrawSkeleton(frame);
+        UI->Increment();
     }
     cout << "Done with Solution" << endl;
 }
