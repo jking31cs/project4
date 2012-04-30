@@ -17,11 +17,13 @@ void onTimer(void *)
 {
 
     if(UI->mPlay_but->value()){
-        UI->mData->mSelectedModel->SetDofs(UI->mData->mSelectedModel->storedQValues[UI->mFrameCounter_cou->value() + 1]);
+        
         UI->Increment();
     }
-      
-  UI->mGLWindow->refresh();
+    if (UI->mData->mSelectedModel != NULL && UI->mData->mSelectedModel->storedQValues.size() > 0) {
+        UI->mData->mSelectedModel->SetDofs(UI->mData->mSelectedModel->storedQValues[UI->mFrameCounter_cou->value() + 1]);
+    }
+    UI->mGLWindow->refresh();
   
   Fl::add_timeout(TICK, onTimer);
 
