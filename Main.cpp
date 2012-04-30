@@ -21,10 +21,10 @@ void onTimer(void *)
         
         UI->Increment();
     }
-    if (UI->mData->mSelectedModel != NULL && UI->mData->mSelectedModel->storedQValues.size() > 0
-        && UI->mData->mSelectedModel->mOpenedC3dFile->GetFrameCount() > 1) {
-        UI->mData->mSelectedModel->SetDofs(UI->mData->mSelectedModel->storedQValues[UI->mFrameCounter_cou->value()]);
-    }
+//    if (UI->mData->mSelectedModel != NULL && UI->mData->mSelectedModel->storedQValues.size() > 0
+//        && UI->mData->mSelectedModel->mOpenedC3dFile->GetFrameCount() > 1) {
+//        UI->mData->mSelectedModel->SetDofs(UI->mData->mSelectedModel->storedQValues[UI->mFrameCounter_cou->value()]);
+//    }
     UI->mGLWindow->refresh();
   
   Fl::add_timeout(TICK, onTimer);

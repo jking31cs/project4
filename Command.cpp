@@ -70,61 +70,68 @@ void LoadModel(void *v)
 
 void Solution(void *v)
 {
-    for (int frame = 0; frame < UI->mData->mSelectedModel->mOpenedC3dFile->GetFrameCount(); frame++) {
-        float F = 0;
-        for (int i = 0; i < UI->mData->mSelectedModel->GetHandleCount(); i++) {
-            F += sqrlen(My_Math_Lib::get_c_value(i, frame));
-        }
-        //cout << "my error" << F << endl;
-        //cout << "My Goal: " << my_Goal << endl;
-        while (true) {
-            //cout << error << endl;
-            Vecd dF_dq = Vecd(UI->mData->mSelectedModel->GetDofCount(), vl_0);
-            //cout << "Starting for loop for dF_dq" << endl;
-            for (int handleIndex = 0; handleIndex < UI->mData->mSelectedModel->GetHandleCount(); handleIndex++) {
-                //  cout<< "On handle #" << handleIndex << endl;
-                Vec3d c_i = My_Math_Lib::get_c_value(handleIndex, frame);
-                //cout << "My delta_C: " << delta_c << endl;
-                Matd jacobian = My_Math_Lib::computeJacobian(handleIndex, frame);
-                //Matd psd = My_Math_Lib::getJacobianPseudoInverse(jacobian);
-                dF_dq += (trans(jacobian) * c_i);
-                // cout << "Current dF_dq: " << dF_dq << endl;
-            }
-            // cout<< "Done with for loop" << endl;
-            //        Vec3d delta_c = My_Math_Lib::get_c_value(0);
-            //        Matd jacobian = My_Math_Lib::computeJacobian(0);
-            //        Matd psd = My_Math_Lib::getJacobianPseudoInverse(jacobian);
-            //        
-            //        Vecd delta_q = psd * delta_c;
-            dF_dq *= 2;
-            cout << "My dF_dq: " << dF_dq << endl;
-            
-            Vecd current_q = Vecd(UI->mData->mSelectedModel->GetDofCount(), vl_0);
-            
-            UI->mData->mSelectedModel->mDofList.GetDofs(&current_q);
-            
-            bool isCloser = false;
-            float alpha = .01;
-            Vecd new_q = current_q - alpha * dF_dq;
-            //            cout << "Current q: " << current_q << endl;
-            //            cout << "My Alpha: " << alpha << endl;
-            //            cout << "df_dq: " << dF_dq << endl;
-            UI->mData->mSelectedModel->SetDofs(new_q);
-            float temp_error = 0;
-            for (int i = 0; i < UI->mData->mSelectedModel->GetHandleCount(); i++) {
-                temp_error += sqrlen(My_Math_Lib::get_c_value(i, frame));
-            }
-            UI->mData->mSelectedModel->storedQValues.push_back(new_q);
-            float errorTest = abs((temp_error - F)/F); 
-            F = temp_error;
-            if (errorTest < .00005) {
-                break;
-            }
-            cout << "My Error is " << F << endl;
-        }
-        UI->mData->mSelectedModel->DrawSkeleton(frame);
-        UI->Increment();
+    
+    int frame = UI->mFrameCounter_cou->value();
+    float F = 0;
+    for (int i = 0; i < UI->mData->mSelectedModel->GetHandleCount(); i++) {
+        F += sqrlen(My_Math_Lib::get_c_value(i, frame));
     }
+//    Vecd q = Vecd(UI->mData->mSelectedModel->GetDofCount(), vl_0);
+//    UI->mData->mSelectedModel->mDofList.GetDofs(&q);
+//    for (int i = 0; i < q.Elts(); i++) {
+//        if (q[i] == 0) {
+//            UI->mData->mSelectedModel->mDofList.SetDof(i, .001);
+//        }
+//    }
+    //cout << "my error" << F << endl;
+    //cout << "My Goal: " << my_Goal << endl;
+    while (true) {
+        //cout << error << endl;
+        Vecd dF_dq = Vecd(UI->mData->mSelectedModel->GetDofCount(), vl_0);
+        //cout << "Starting for loop for dF_dq" << endl;
+        for (int handleIndex = 0; handleIndex < UI->mData->mSelectedModel->GetHandleCount(); handleIndex++) {
+            if (sqrlen(UI->mData->mSelectedModel->mHandleList[handleIndex]->mGlobalPos) < .001) continue;
+            //  cout<< "On handle #" << handleIndex << endl;
+            Vec3d c_i = My_Math_Lib::get_c_value(handleIndex, frame);
+            //cout << "My delta_C: " << delta_c << endl;
+            Matd jacobian = My_Math_Lib::computeJacobian(handleIndex, frame);
+            //Matd psd = My_Math_Lib::getJacobianPseudoInverse(jacobian);
+            dF_dq += (trans(jacobian) * c_i);
+            // cout << "Current dF_dq: " << dF_dq << endl;
+        }
+        // cout<< "Done with for loop" << endl;
+        //        Vec3d delta_c = My_Math_Lib::get_c_value(0);
+        //        Matd jacobian = My_Math_Lib::computeJacobian(0);
+        //        Matd psd = My_Math_Lib::getJacobianPseudoInverse(jacobian);
+        //        
+        //        Vecd delta_q = psd * delta_c;
+        dF_dq *= 2;
+        cout << "My dF_dq: " << dF_dq << endl;
+        
+        Vecd current_q = Vecd(UI->mData->mSelectedModel->GetDofCount(), vl_0);
+        
+        UI->mData->mSelectedModel->mDofList.GetDofs(&current_q);
+        
+        bool isCloser = false;
+        float alpha = .01;
+        Vecd new_q = current_q - alpha * dF_dq;
+        //            cout << "Current q: " << current_q << endl;
+        //            cout << "My Alpha: " << alpha << endl;
+        //            cout << "df_dq: " << dF_dq << endl;
+        UI->mData->mSelectedModel->SetDofs(new_q);
+        float temp_error = 0;
+        for (int i = 0; i < UI->mData->mSelectedModel->GetHandleCount(); i++) {
+            temp_error += sqrlen(My_Math_Lib::get_c_value(i, frame));
+        }
+        
+        float errorTest = abs((temp_error - F)/F); 
+        F = temp_error;
+        if (errorTest < .00005 || F < .00001) {
+            break;
+        }
+        cout << "My Error is " << F << endl;
+    }
+    cout << "Did frame #" << frame << endl;
     cout << "Done with Solution" << endl;
 }
 
