@@ -50,9 +50,8 @@ class Translate : public Transform
   virtual Mat4d GetDeriv(int dof) { 
       
       Mat4d toRet = vl_0;
-      if (mOffset[0] != 0) toRet[0][3] = 1;
-      if (mOffset[1] != 0) toRet[1][3] = 1;
-      if (mOffset[2] != 0) toRet[2][3] = 1;
+      toRet[dof][3] = 1;
+      //cout << "I am translating on " << dof << endl;
       return toRet;
   };
         
