@@ -8,6 +8,7 @@
 #include <time.h>
 #include "PhowardData.h"
 #include "Model.h"
+#include "C3dFileInfo.h"
 
 static double TICK = 0.02;
 
@@ -20,8 +21,9 @@ void onTimer(void *)
         
         UI->Increment();
     }
-    if (UI->mData->mSelectedModel != NULL && UI->mData->mSelectedModel->storedQValues.size() > 0) {
-        UI->mData->mSelectedModel->SetDofs(UI->mData->mSelectedModel->storedQValues[UI->mFrameCounter_cou->value() + 1]);
+    if (UI->mData->mSelectedModel != NULL && UI->mData->mSelectedModel->storedQValues.size() > 0
+        && UI->mData->mSelectedModel->mOpenedC3dFile->GetFrameCount() > 1) {
+        UI->mData->mSelectedModel->SetDofs(UI->mData->mSelectedModel->storedQValues[UI->mFrameCounter_cou->value()]);
     }
     UI->mGLWindow->refresh();
   
