@@ -18,16 +18,17 @@ float My_Math_Lib::test() {
     return 1.f;
 }
 
-Vec3d My_Math_Lib::get_c_value(int handleIndex) {
+Vec3d My_Math_Lib::get_c_value(int handleIndex, int frameIndex) {
     Marker* mark = UI->mData->mSelectedModel->mHandleList[handleIndex];
-    Vec3d p_line = UI->mData->mSelectedModel->mOpenedC3dFile->GetMarkerPos(0,handleIndex);
+    Vec3d p_line = UI->mData->mSelectedModel->mOpenedC3dFile->GetMarkerPos(frameIndex,handleIndex);
     return mark->mGlobalPos - p_line;
 }
 
 
 Matd My_Math_Lib::computeJacobian(int handleIndex) {
     Model* selectedModel =  UI->mData->mSelectedModel;
-    Matd J = Matd(3, selectedModel->GetDofCount());
+    Matd J = Matd(3, selectedModel->GetDofCount(), vl_0);
+    //cout << "My Jacobian before calculating" << J << endl;
     Marker* mark = selectedModel->mHandleList[handleIndex];
     TransformNode* node = selectedModel->mLimbs[mark->mNodeIndex];
     while (node != NULL) {
@@ -59,7 +60,7 @@ Matd My_Math_Lib::computeJacobian(int handleIndex) {
             Dof* dof = node->mTransforms[derivIndex]->GetDof(0);
             int column = dof->mId;
             
-            cout << "new column: " << column << endl;
+            //cout << "new column: " << column << endl;
             
             J[0][column] = J_i[0];
             J[1][column] = J_i[1];
@@ -70,13 +71,13 @@ Matd My_Math_Lib::computeJacobian(int handleIndex) {
         node = node->mParentNode;
     }
     
-    cout << "My Jacobian fresh from calculating: " << J << endl; 
+    //cout << "My Jacobian fresh from calculating: " << J << endl; 
     return J;
 }
 
 Matd My_Math_Lib::getJacobianPseudoInverse(Matd jacobianMatrix) {
     Matd Jt_times_J = trans(jacobianMatrix) * jacobianMatrix;
-    cout << "My Jacobian Transpose times Jacobian: " << Jt_times_J << endl;
+   // cout << "My Jacobian Transpose times Jacobian: " << Jt_times_J << endl;
     Matd temp = inv(Jt_times_J);
     return temp * trans(jacobianMatrix);
 }
